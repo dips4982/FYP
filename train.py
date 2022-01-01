@@ -12,3 +12,4 @@ dataset.download_dataset("Images", "train")
 dataset.download_dataset("Questions", "train")
 
 ex_img.ImgExtractor().extract(directories["img_train"])
+ex_text.TextFeatureExtractor().extract_features(directories["ques_train"])
