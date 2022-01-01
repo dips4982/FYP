@@ -5,7 +5,7 @@ import h5py
 import numpy
 from sentence_transformers import SentenceTransformer
 
-class textFeatureExtractor():
+class TextFeatureExtractor():
 
     def __init__(self):
         self.classifier = SentenceTransformer('sentence-transformers/paraphrase-MiniLM-L6-v2')
