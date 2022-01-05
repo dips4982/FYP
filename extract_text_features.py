@@ -20,7 +20,7 @@ class TextFeatureExtractor():
                     
                     
     def load_features(self):
-            fileh5 = h5py.File('text_features_train.hdf5', 'r')
+        fileh5 = h5py.File('text_features_train.hdf5', 'r')
         item = fileh5['item']
         keys = item.keys()
         out_dict = {}
