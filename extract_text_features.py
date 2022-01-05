@@ -14,7 +14,7 @@ class TextFeatureExtractor():
         path = 'item/'
         classifier = self.classifier
         with open('/content/drive/MyDrive/VQA_FinalYrProject/pretty.json') as data_file:    
-            with h5py.File('/content/drive/MyDrive/VQA_FinalYrProject/text_features_data.h5', 'w') as h5file:
+            with h5py.File('text_features_train.hdf5', 'w') as h5file:
                 data = json.load(data_file)
                 for questions in data['questions']:
                     h5file[path+str(questions['question_id'])] = classifier.encode(questions['question'])
