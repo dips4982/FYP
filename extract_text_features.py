@@ -11,13 +11,12 @@ class TextFeatureExtractor():
         self.classifier = SentenceTransformer('sentence-transformers/paraphrase-MiniLM-L6-v2')
 
     def extract_features(self, direc):
-        path = 'item/'
         classifier = self.classifier
-        with open('/content/drive/MyDrive/VQA_FinalYrProject/pretty.json') as data_file:    
+        with open('answers.json') as data_file:    
             with h5py.File('text_features_train.hdf5', 'w') as h5file:
                 data = json.load(data_file)
                 for questions in data['questions']:
-                    h5file[path+str(questions['question_id'])] = classifier.encode(questions['question'])
+                    h5file[str(questions['question_id'])] = classifier.encode(questions['question'])
 
-        
+            
     

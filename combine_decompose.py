@@ -15,23 +15,40 @@ def gen_img_ids():
     return ids
 
 
+def get_img_id(ques_id):
+
+    for i in range(12 - len(ques_id)):
+        ques_id = "0" + ques_id
+    return ques_id[:12]
+
+
 def combine_decompose(text_hdf5, img_hdf5):
     tensor_to_decompose = []
 
     image_ids = gen_img_ids()
 
-    with h5py.File(img_hdf5, 'r') as f, h5py.File(text_hdf5, 'r') as fq:
-        for i in image_ids:
-            tensor_to_decompose.append(np.tensordot(f[i], fq[i], 0))
-
     core_tensors = []
-    for tensor in tensor_to_decompose:
-        core, factors = tucker(np.array(tensor), rank=[1, 1, 3000])
-        core_tensors.append(core)
+    ques_ids = []
 
     hdf5_file = h5py.File("core_tensors_train.hdf5", 'w')
 
-    for i in tqdm(range(len(image_ids))):
-        hdf5_file[image_ids[i]] = core_tensors[i]
+    with h5py.File(img_hdf5, 'r') as fi, h5py.File(text_hdf5, 'r') as fq:
+        ques_ids = list(fq.keys())
+        for q_id in ques_ids:
+            q_id = str(q_id)
+            img_id = get_img_id(q_id)
+            tensor_dot = np.tensordot(fi[img_id], fq[q_id], 0)
+            core, factors = tucker(np.array(tensor_dot), rank=[1, 16000])
+            core_tensors.append(core)
+
+    
+    # for tensor in tensor_to_decompose:
+    #     core, factors = tucker(np.array(tensor), rank=[1, 16000])
+    #     core_tensors.append(core)
+
+    hdf5_file = h5py.File("core_tensors_train.hdf5", 'w')
+
+    for i in tqdm(range(len(ques_ids))):
+        hdf5_file[ques_ids[i]] = core_tensors[i]
 
     hdf5_file.close()

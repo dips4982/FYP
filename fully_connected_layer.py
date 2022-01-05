@@ -1,10 +1,12 @@
+import h5py
 import torch
 from torch import nn
 from torch.autograd import Variable
+import combine_decompose as c_d
 
 # N is batch size; D_in is input dimension;
 # H is hidden dimension; D_out is output dimension.
-N, D_in, H, D_out = 4, 4, 100, 16
+N, D_in, H, D_out = 1, 16000, 100, 3000
 
 class FCLayer(nn.Module):
     def __init__(self):
@@ -21,15 +23,25 @@ class FCLayer(nn.Module):
         return x
 
 
-def train_fc_layer():
+def train_fc_layer(core_hdf5, embeddings_file):
     # instantiate the model
     model = FCLayer()
 
     # print model architecture
     print(model)
 
+    image_ids = c_d.gen_img_ids()
+
+    input_tensor = []
+    with h5py.File(core_hdf5, 'r') as f:
+        for i in image_ids:
+            input_tensor.append(f[i])
+
+    for x in input_tensor:
+        x = Variable(torch.from_numpy(x))
+
     # Create random Tensors to hold inputs and outputs, and wrap them in Variables.
-    x = Variable(torch.randn(N, D_in))
+    # x = Variable(torch.randn(N, D_in))
     y = Variable(torch.randn(N, D_out), requires_grad=True)
 
     # Use the nn package to define our model as a sequence of layers. nn.Sequential
@@ -73,3 +85,5 @@ def train_fc_layer():
         # we can access its data and gradients like we did before.
         for param in model.parameters():
             param.data -= learning_rate * param.grad.data
+
+    torch.save(model, "model.pt")
