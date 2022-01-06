@@ -30,6 +30,13 @@ def download_dataset(cwd, dataset_type = "images", dataset_part = "train"):
                 os.system('wget https://s3.amazonaws.com/cvmlp/vqa/mscoco/vqa/v2_Questions_Train_mscoco.zip')
                 os.system('unzip v2_Questions_Train_mscoco.zip')
                 os.system('rm v2_Questions_Train_mscoco.zip')
+
+            if os.path.isdir("v2_Annotations_Train_mscoco"):
+                print("Train dataset for Annotations already present")
+            else:
+                os.system('wget https://s3.amazonaws.com/cvmlp/vqa/mscoco/vqa/v2_Annotations_Train_mscoco.zip')
+                os.system('unzip v2_Annotations_Train_mscoco.zip')
+                os.system('rm v2_Annotations_Train_mscoco.zip')
         else:
             if os.path.isdir("v2_Questions_Val_mscoco"):
                 print("Val dataset for Questions already present")
@@ -37,5 +44,14 @@ def download_dataset(cwd, dataset_type = "images", dataset_part = "train"):
                 os.system('wget https://s3.amazonaws.com/cvmlp/vqa/mscoco/vqa/v2_Questions_Val_mscoco.zip')
                 os.system('unzip v2_Questions_Val_mscoco.zip')
                 os.system('rm v2_Questions_Val_mscoco.zip')
+
+            if os.path.isdir("v2_Annotations_Val_mscoco"):
+                print("Val dataset for Annotations already present")
+            else:
+                os.system('wget https://s3.amazonaws.com/cvmlp/vqa/mscoco/vqa/v2_Annotations_Val_mscoco.zip')
+                os.system('unzip v2_Annotations_Val_mscoco.zip')
+                os.system('rm v2_Annotations_Val_mscoco.zip')
+
+                
 
         
