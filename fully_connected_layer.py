@@ -47,7 +47,8 @@ def train_fc_layer(core_hdf5, embeddings_file, annotations_file):
             for element in ans_data['annotations']:
                 if element['question_id'] == i:
                     if element['multiple_choice_answer'] in freq_ans_data:
-                        output_tensor.append(freq_ans_data[element['multiple_choice_answer']])
+                        ans_arr = [int(x) for x in freq_ans_data[element['multiple_choice_answer']]]
+                        output_tensor.append(torch.Tensor(ans_arr))
                     else:
                         output_tensor.append(freq_ans_data["yes"])
 
