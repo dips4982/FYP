@@ -2,7 +2,7 @@ import h5py
 import torch
 from torch import nn
 from torch.autograd import Variable
-import combine_decompose as c_d
+import json
 
 # N is batch size; D_in is input dimension;
 # H is hidden dimension; D_out is output dimension.
@@ -23,19 +23,33 @@ class FCLayer(nn.Module):
         return x
 
 
-def train_fc_layer(core_hdf5, embeddings_file):
+def train_fc_layer(core_hdf5, embeddings_file, annotations_file):
     # instantiate the model
     model = FCLayer()
 
     # print model architecture
     print(model)
 
-    image_ids = c_d.gen_img_ids()
+    ans_file = open(annotations_file)
+    ans_data = json.load(ans_file)
+
+    freq_ans_file = open(embeddings_file)
+    freq_ans_data = json.load(freq_ans_file)
 
     input_tensor = []
-    with h5py.File(core_hdf5, 'r') as f:
-        for i in image_ids:
-            input_tensor.append(f[i])
+    output_tensor = []
+
+    with h5py.File(core_hdf5, 'r') as core_file:
+        ques_ids = list(core_file.keys())
+        for i in ques_ids:
+            input_tensor.append(core_file[i])
+            
+            for element in ans_data['annotations']:
+                if element['question_id'] == i:
+                    if element['multiple_choice_answer'] in freq_ans_data:
+                        output_tensor.append(freq_ans_data[element['multiple_choice_answer']])
+                    else:
+                        output_tensor.append(freq_ans_data["yes"])
 
     for x in input_tensor:
         x = Variable(torch.from_numpy(x))

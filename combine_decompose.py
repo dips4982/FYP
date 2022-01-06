@@ -5,14 +5,14 @@ from tensorly.decomposition import tucker
 from tqdm import tqdm
 
 
-def gen_img_ids():
-    ids = []
-    id = "000000000000"
+# def gen_img_ids():
+#     ids = []
+#     id = "000000000000"
 
-    for i in range(1, 82784):
-        ids.append(id[:12 - len(str(i))] + str(i))
+#     for i in range(1, 82784):
+#         ids.append(id[:12 - len(str(i))] + str(i))
 
-    return ids
+#     return ids
 
 
 def get_img_id(ques_id):
@@ -25,7 +25,7 @@ def get_img_id(ques_id):
 def combine_decompose(text_hdf5, img_hdf5):
     tensor_to_decompose = []
 
-    image_ids = gen_img_ids()
+    # image_ids = gen_img_ids()
 
     core_tensors = []
     ques_ids = []
