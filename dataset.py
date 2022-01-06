@@ -2,7 +2,7 @@ import os
 
 def download_dataset(cwd, dataset_type = "images", dataset_part = "train"):
     if not os.path.isdir("data"):
-        os.system('mkdir data')
+        os.system('mkdir cwd/data')
 
     os.system('cd data')
 

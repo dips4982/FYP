@@ -6,6 +6,7 @@ from torch.autograd import Variable
 from PIL import Image
 import h5py
 from tqdm import tqdm
+import os
 
 
 class ImgExtractor():
