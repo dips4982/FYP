@@ -50,14 +50,19 @@ def train_fc_layer(core_hdf5, embeddings_file, annotations_file):
                         ans_arr = [int(x) for x in freq_ans_data[element['multiple_choice_answer']]]
                         output_tensor.append(torch.Tensor(ans_arr))
                     else:
-                        output_tensor.append(freq_ans_data["yes"])
+                        ans_arr = [int(x) for x in freq_ans_data["yes"]]
+                        output_tensor.append(torch.Tensor(ans_arr))
 
-    for x in input_tensor:
-        x = Variable(torch.from_numpy(x))
+    loss_fn = torch.nn.MSELoss(size_average=False)
 
-    # Create random Tensors to hold inputs and outputs, and wrap them in Variables.
-    # x = Variable(torch.randn(N, D_in))
-    y = Variable(torch.randn(N, D_out), requires_grad=True)
+    learning_rate = 1e-4
+
+    for i in range(len(input_tensor)):
+        x = Variable(input_tensor[i])
+
+        # Create random Tensors to hold inputs and outputs, and wrap them in Variables.
+        # x = Variable(torch.randn(N, D_in))
+        y = Variable(output_tensor[i], requires_grad=True)
 
     # Use the nn package to define our model as a sequence of layers. nn.Sequential
     # is a Module which contains other Modules, and applies them in sequence to
@@ -71,10 +76,7 @@ def train_fc_layer(core_hdf5, embeddings_file, annotations_file):
 
     # The nn package also contains definitions of popular loss functions; in this
     # case we will use Mean Squared Error (MSE) as our loss function.
-    loss_fn = torch.nn.MSELoss(size_average=False)
-
-    learning_rate = 1e-4
-    for t in range(500):
+    
         # Forward pass: compute predicted y by passing x to the model. Module objects
         # override the __call__ operator so you can call them like functions. When
         # doing so you pass a Variable of input data to the Module and it produces
