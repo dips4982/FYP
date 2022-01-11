@@ -6,7 +6,7 @@ import combine_decompose as c_d
 import fully_connected_layer as fcl
 
 # store cwd path
-repo_path = os.getcwd() + "/FYP"
+repo_path = os.getcwd() 
 
 directories = {
     "img_train" : "/data/train2014",

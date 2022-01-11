@@ -16,7 +16,7 @@ from tqdm import tqdm
 
 
 def get_img_id(ques_id):
-
+    ques_id = ques_id[:len(ques_id) - 3]
     for i in range(12 - len(ques_id)):
         ques_id = "0" + ques_id
     return ques_id[:12]
