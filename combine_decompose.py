@@ -5,16 +5,6 @@ from tensorly.decomposition import tucker
 from tqdm import tqdm
 
 
-# def gen_img_ids():
-#     ids = []
-#     id = "000000000000"
-
-#     for i in range(1, 82784):
-#         ids.append(id[:12 - len(str(i))] + str(i))
-
-#     return ids
-
-
 def get_img_id(ques_id):
     ques_id = ques_id[:len(ques_id) - 3]
     for i in range(12 - len(ques_id)):
@@ -36,7 +26,7 @@ def combine_decompose(text_hdf5, img_hdf5):
         ques_ids = list(fq.keys())
         for q_id in ques_ids:
             q_id = str(q_id)
-            img_id = get_img_id(q_id)
+            img_id = q_id[:len(q_id) - 3]
             tensor_dot = np.tensordot(fi[img_id], fq[q_id], 0)
             core, factors = tucker(np.array(tensor_dot), rank=[1, 16000])
             core_tensors.append(core)
