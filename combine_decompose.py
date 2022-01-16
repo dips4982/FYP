@@ -5,13 +5,6 @@ from tensorly.decomposition import tucker
 from tqdm import tqdm
 
 
-def get_img_id(ques_id):
-    ques_id = ques_id[:len(ques_id) - 3]
-    for i in range(12 - len(ques_id)):
-        ques_id = "0" + ques_id
-    return ques_id[:12]
-
-
 def combine_decompose(text_hdf5, img_hdf5):
     tensor_to_decompose = []
 
@@ -19,8 +12,6 @@ def combine_decompose(text_hdf5, img_hdf5):
 
     core_tensors = []
     ques_ids = []
-
-    hdf5_file = h5py.File("core_tensors_train.hdf5", 'w')
 
     with h5py.File(img_hdf5, 'r') as fi, h5py.File(text_hdf5, 'r') as fq:
         ques_ids = list(fq.keys())
