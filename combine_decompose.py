@@ -27,7 +27,7 @@ def combine_decompose(text_hdf5, img_hdf5):
     #     core, factors = tucker(np.array(tensor), rank=[1, 16000])
     #     core_tensors.append(core)
 
-    hdf5_file = h5py.File("core_tensors_train.hdf5", 'w')
+    hdf5_file = h5py.File("/data/core_tensors_train.hdf5", 'w')
 
     for i in tqdm(range(len(ques_ids))):
         hdf5_file[ques_ids[i]] = core_tensors[i]

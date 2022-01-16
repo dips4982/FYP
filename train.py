@@ -13,8 +13,8 @@ directories = {
     "img_val" : "/data/val2014",
     "ques_train" : "/data/v2_Questions_Train_mscoco.json",
     "ques_val" : "/data/v2_Questions_Val_mscoco.json",
-    "ans_train" : "/data/v2_Annotations_Train_mscoco.json",
-    "ans_val" : "/data/v2_Annotations_Val_mscoco.json"
+    "ans_train" : "/data/v2_mscoco_train2014_annotations.json",
+    "ans_val" : "/data/v2_mscoco_val2014_annotations.json"
 }
 
 HDF5_files = {
