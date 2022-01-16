@@ -3,6 +3,7 @@ import torch
 from torch import nn
 from torch.autograd import Variable
 import json
+import numpy as np
 
 # N is batch size; D_in is input dimension;
 # H is hidden dimension; D_out is output dimension.
@@ -42,7 +43,7 @@ def train_fc_layer(core_hdf5, embeddings_file, annotations_file):
     with h5py.File(core_hdf5, 'r') as core_file:
         ques_ids = list(core_file.keys())
         for i in ques_ids:
-            input_tensor.append(core_file[i])
+            input_tensor.append(torch.Tensor(np.array(core_file[i])))
             
             for element in ans_data['annotations']:
                 if element['question_id'] == int(i):

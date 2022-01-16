@@ -30,4 +30,4 @@ ex_img.ImgExtractor().extract(repo_path + directories["img_train"])
 ex_text.TextFeatureExtractor().extract_features(repo_path + directories["ques_train"])
 
 c_d.combine_decompose(repo_path + HDF5_files["text"], repo_path + HDF5_files["img"])
-fcl.train_fc_layer(repo_path + HDF5_files["core_tensors"], repo_path + "frequent_embeddings.json", repo_path + directories["ans_train"])
+fcl.train_fc_layer(repo_path + HDF5_files["core_tensors"], repo_path + "/frequent_embeddings.json", repo_path + directories["ans_train"])
