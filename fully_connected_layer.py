@@ -2,7 +2,8 @@ import h5py
 import torch
 from torch import nn
 from torch.autograd import Variable
-import combine_decompose as c_d
+import json
+import numpy as np
 
 # N is batch size; D_in is input dimension;
 # H is hidden dimension; D_out is output dimension.
@@ -23,26 +24,46 @@ class FCLayer(nn.Module):
         return x
 
 
-def train_fc_layer(core_hdf5, embeddings_file):
+def train_fc_layer(core_hdf5, embeddings_file, annotations_file):
     # instantiate the model
     model = FCLayer()
 
     # print model architecture
     print(model)
 
-    image_ids = c_d.gen_img_ids()
+    ans_file = open(annotations_file)
+    ans_data = json.load(ans_file)
+
+    freq_ans_file = open(embeddings_file)
+    freq_ans_data = json.load(freq_ans_file)
 
     input_tensor = []
-    with h5py.File(core_hdf5, 'r') as f:
-        for i in image_ids:
-            input_tensor.append(f[i])
+    output_tensor = []
 
-    for x in input_tensor:
-        x = Variable(torch.from_numpy(x))
+    with h5py.File(core_hdf5, 'r') as core_file:
+        ques_ids = list(core_file.keys())
+        for i in ques_ids:
+            input_tensor.append(torch.Tensor(np.array(core_file[i])))
+            
+            for element in ans_data['annotations']:
+                if element['question_id'] == int(i):
+                    if element['multiple_choice_answer'] in freq_ans_data:
+                        ans_arr = [int(x) for x in freq_ans_data[element['multiple_choice_answer']]]
+                        output_tensor.append(torch.Tensor(ans_arr))
+                    else:
+                        ans_arr = [int(x) for x in freq_ans_data["yes"]]
+                        output_tensor.append(torch.Tensor(ans_arr))
 
-    # Create random Tensors to hold inputs and outputs, and wrap them in Variables.
-    # x = Variable(torch.randn(N, D_in))
-    y = Variable(torch.randn(N, D_out), requires_grad=True)
+    loss_fn = torch.nn.MSELoss(size_average=False)
+
+    learning_rate = 1e-4
+
+    for i in range(len(input_tensor)):
+        x = Variable(input_tensor[i])
+
+        # Create random Tensors to hold inputs and outputs, and wrap them in Variables.
+        # x = Variable(torch.randn(N, D_in))
+        y = Variable(output_tensor[i], requires_grad=True)
 
     # Use the nn package to define our model as a sequence of layers. nn.Sequential
     # is a Module which contains other Modules, and applies them in sequence to
@@ -56,10 +77,7 @@ def train_fc_layer(core_hdf5, embeddings_file):
 
     # The nn package also contains definitions of popular loss functions; in this
     # case we will use Mean Squared Error (MSE) as our loss function.
-    loss_fn = torch.nn.MSELoss(size_average=False)
-
-    learning_rate = 1e-4
-    for t in range(500):
+    
         # Forward pass: compute predicted y by passing x to the model. Module objects
         # override the __call__ operator so you can call them like functions. When
         # doing so you pass a Variable of input data to the Module and it produces

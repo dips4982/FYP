@@ -6,6 +6,7 @@ from torch.autograd import Variable
 from PIL import Image
 import h5py
 from tqdm import tqdm
+import os
 
 
 class ImgExtractor():
@@ -52,6 +53,6 @@ class ImgExtractor():
         hdf5_file = h5py.File("image_features_train.hdf5", 'w')
 
         for i in tqdm(range(len(img_files))):
-            hdf5_file[img_files[i][15:27]] = self.get_vector(direc + "/" + img_files[i]).detach().cpu().numpy()
+            hdf5_file[str(int(img_files[i][15:27]))] = self.get_vector(direc + "/" + img_files[i]).detach().cpu().numpy()
 
         hdf5_file.close()
