@@ -8,16 +8,17 @@ from sentence_transformers import SentenceTransformer
 class TextFeatureExtractor():
 
     def __init__(self):
-        self.classifier = SentenceTransformer('sentence-transformers/paraphrase-MiniLM-L6-v2')
+        self.classifier = SentenceTransformer('sentence-transformers/distilbert-base-nli-max-tokens')
 
-    def extract_features(self, direc):
+    def extract_features(self):
         classifier = self.classifier
         with open('questions.json') as data_file:    
             with h5py.File('text_features_train.hdf5', 'w') as h5file:
                 data = json.load(data_file)
                 for questions in data['questions']:
                     h5file[str(questions['question_id'])] = classifier.encode(questions['question'])
-                    
+                    print(h5file[str(questions['question_id'])].shape)
+                    break
                     
     def load_features(self):
         fileh5 = h5py.File('text_features_train.hdf5', 'r')
@@ -28,5 +29,5 @@ class TextFeatureExtractor():
             out_dict[key] = item[key][()]
         fileh5.close()
         return out_dict
-            
+    
     
