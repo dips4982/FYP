@@ -1,0 +1,2 @@
+read the research paper
+try to implement code on smaller dataset.
