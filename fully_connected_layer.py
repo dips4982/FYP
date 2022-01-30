@@ -45,18 +45,18 @@ def train_fc_layer(core_hdf5, embeddings_file, annotations_file):
     with h5py.File(core_hdf5, 'r') as core_file:
         ques_ids = list(core_file.keys())
         for i in ques_ids:
-            input_tensor.append(Variable(torch.Tensor(np.array(core_file[i]))))
+            input_tensor.append(Variable(torch.Tensor(np.array(core_file[i])), requires_grad=True))
             
             for element in ans_data['annotations']:
                 if element['question_id'] == int(i):
                     if element['multiple_choice_answer'] in freq_ans_data:
-                        ans_arr = [[int(x) for x in freq_ans_data[element['multiple_choice_answer']]]]
-                        output_tensor.append(Variable(torch.Tensor(ans_arr)))
+                        ans_arr = [int(x) for x in freq_ans_data[element['multiple_choice_answer']]]
+                        output_tensor.append(Variable(torch.Tensor(ans_arr), requires_grad=True))
                     else:
-                        ans_arr = [[int(x) for x in freq_ans_data["yes"]]]
-                        output_tensor.append(Variable(torch.Tensor(ans_arr)))
+                        ans_arr = [int(x) for x in freq_ans_data["yes"]]
+                        output_tensor.append(Variable(torch.Tensor(ans_arr), requires_grad=True))
 
-    loss_fn = torch.nn.MSELoss(size_average=False)
+    loss_fn = torch.nn.NLLLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr = 0.01)
 
     learning_rate = 1e-4
@@ -75,47 +75,23 @@ def train_fc_layer(core_hdf5, embeddings_file, annotations_file):
         # x = Variable(torch.randn(N, D_in))
         y = output_tensor[i]
 
-        # Use the nn package to define our model as a sequence of layers. nn.Sequential
-        # is a Module which contains other Modules, and applies them in sequence to
-        # produce its output. Each Linear Module computes output from input using a
-        # linear function, and holds internal Variables for its weight and bias.
-        # model = torch.nn.Sequential(
-        #     torch.nn.Linear(D_in, H),
-        #     torch.nn.ReLU(),
-        #     torch.nn.Linear(H, D_out),
-        # )
-
         # Clear the gradients
         optimizer.zero_grad()
 
-        # The nn package also contains definitions of popular loss functions; in this
-        # case we will use Mean Squared Error (MSE) as our loss function.
-    
-        # Forward pass: compute predicted y by passing x to the model. Module objects
-        # override the __call__ operator so you can call them like functions. When
-        # doing so you pass a Variable of input data to the Module and it produces
-        # a Variable of output data.
+        # Forward pass
         y_pred = model(x)
+        output = torch.flatten((y_pred>0.2).int())
 
-        # Compute and print loss. We pass Variables containing the predicted and true
-        # values of y, and the loss function returns a Variable containing the
-        # loss.
-        loss = loss_fn(y_pred, y)
-        # print(i, loss.data)
+        # Compute and print loss
+        # print(torch.argmax(torch.flatten(y_pred)),torch.argmax(y))
+        print(torch.argmax(torch.flatten(y_pred)),torch.argmax(y))
+        loss = loss_fn(torch.flatten(y_pred), y.long())
 
         # Zero the gradients before running the backward pass.
         model.zero_grad()
 
-        # Backward pass: compute gradient of the loss with respect to all the learnable
-        # parameters of the model. Internally, the parameters of each Module are stored
-        # in Variables with requires_grad=True, so this call will compute gradients for
-        # all learnable parameters in the model.
+        # Backward pass:
         loss.backward()
-
-        # Update the weights using gradient descent. Each parameter is a Variable, so
-        # we can access its data and gradients like we did before.
-        # for param in model.parameters():
-        #     param.data -= learning_rate * param.grad.data
 
         # Update Weights
         optimizer.step()
@@ -123,7 +99,6 @@ def train_fc_layer(core_hdf5, embeddings_file, annotations_file):
         # Calculat Loss
         train_loss += loss.item()
         # training step accuracy
-        output = (y_pred>0.5).int()
         batch_acc = train_accuracy(output, y.to(dtype=torch.int32))
         # print(batch_acc)
 
