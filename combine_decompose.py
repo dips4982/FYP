@@ -5,11 +5,11 @@ from tensorly.decomposition import tucker
 from tqdm import tqdm
 
 
-def combine_decompose(text_hdf5, img_hdf5):
+def combine_decompose(text_hdf5, img_hdf5, core_hdf5):
     tensor_to_decompose = []
     ques_ids = []
 
-    hdf5_file = h5py.File("/data/core_tensors_train.hdf5", 'w')
+    hdf5_file = h5py.File(core_hdf5, 'w')
 
     with h5py.File(img_hdf5, 'r') as fi, h5py.File(text_hdf5, 'r') as fq:
         ques_ids = list(fq.keys())
