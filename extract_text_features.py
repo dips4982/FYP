@@ -17,8 +17,7 @@ class TextFeatureExtractor():
                 data = json.load(data_file)
                 for questions in data['questions']:
                     h5file[str(questions['question_id'])] = classifier.encode(questions['question'])
-                    print(h5file[str(questions['question_id'])].shape)
-                    break
+                 
                     
     def load_features(self):
         fileh5 = h5py.File('text_features_train.hdf5', 'r')
