@@ -8,26 +8,11 @@ import fully_connected_layer as fcl
 # store cwd path
 repo_path = os.getcwd() 
 
-directories = {
-    "img_train" : "/data/train2014",
-    "img_val" : "/data/val2014",
-    "ques_train" : "/data/v2_Questions_Train_mscoco.json",
-    "ques_val" : "/data/v2_Questions_Val_mscoco.json",
-    "ans_train" : "/data/v2_mscoco_train2014_annotations.json",
-    "ans_val" : "/data/v2_mscoco_val2014_annotations.json"
-}
-
-HDF5_files = {
-    "text" : "/data/text_features_train.hdf5",
-    "img" : "/data/image_features_train.hdf5",
-    "core_tensors" : "/data/core_tensors_train.hdf5"
-}
-
 dataset.download_dataset(repo_path, "images", "train")
 dataset.download_dataset(repo_path, "questions", "train")
 
-ex_img.ImgExtractor().extract(repo_path + directories["img_train"])
-ex_text.TextFeatureExtractor().extract_features(repo_path + directories["ques_train"])
+ex_img.ImgExtractor().extract(repo_path + dataset.directories["img_train"], "train")
+ex_text.TextFeatureExtractor().extract_features(repo_path + dataset.directories["ques_train"], "train")
 
-c_d.combine_decompose(repo_path + HDF5_files["text"], repo_path + HDF5_files["img"], repo_path + HDF5_files["core_tensors"])
-fcl.train_fc_layer(repo_path + HDF5_files["core_tensors"], repo_path + "/frequent_embeddings.json", repo_path + directories["ans_train"])
+c_d.combine_decompose(repo_path + dataset.HDF5_files["text_train"], repo_path + dataset.HDF5_files["img_train"], repo_path + dataset.HDF5_files["core_tensors"])
+fcl.train_fc_layer(repo_path + dataset.HDF5_files["core_tensors_train"], repo_path + "/frequent_embeddings.json", repo_path + dataset.directories["ans_train"])

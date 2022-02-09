@@ -1,5 +1,25 @@
 import os
 
+
+directories = {
+    "img_train" : "/data/train2014",
+    "img_val" : "/data/val2014",
+    "ques_train" : "/data/v2_Questions_Train_mscoco.json",
+    "ques_val" : "/data/v2_Questions_Val_mscoco.json",
+    "ans_train" : "/data/v2_mscoco_train2014_annotations.json",
+    "ans_val" : "/data/v2_mscoco_val2014_annotations.json"
+}
+
+HDF5_files = {
+    "text_train" : "/data/text_features_train.hdf5",
+    "img_train" : "/data/image_features_train.hdf5",
+    "core_tensors_train" : "/data/core_tensors_train.hdf5",
+
+    "text_val" : "/data/text_features_val.hdf5",
+    "img_val" : "/data/image_features_val.hdf5",
+    "core_tensors_val" : "/data/core_tensors_val.hdf5"
+}
+
 def download_dataset(cwd, dataset_type = "images", dataset_part = "train"):
     if not os.path.isdir(cwd + "/data"):
         os.system('mkdir ' + cwd + '/data')

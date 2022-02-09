@@ -47,10 +47,10 @@ class ImgExtractor():
         # 8. Return the feature vector
         return my_embedding
 
-    def extract(self, direc):
+    def extract(self, direc, dataset_part = "train"):
         img_files = list(os.listdir(direc))
 
-        hdf5_file = h5py.File("image_features_train.hdf5", 'w')
+        hdf5_file = h5py.File("image_features_" + dataset_part + ".hdf5", 'w')
 
         for i in tqdm(range(len(img_files))):
             hdf5_file[str(int(img_files[i][15:27]))] = self.get_vector(direc + "/" + img_files[i]).detach().cpu().numpy()
