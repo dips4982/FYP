@@ -8,7 +8,7 @@ import extract_text_features as ex_text
 import combine_decompose as c_d
 
 from numpy import vstack
-import tqdm
+from tqdm import tqdm
 
 import torch
 from torchmetrics.classification import Accuracy
@@ -24,7 +24,7 @@ dataset.download_dataset(repo_path, "questions", "val")
 ex_img.ImgExtractor().extract(repo_path + dataset.directories["img_val"], "val")
 ex_text.TextFeatureExtractor().extract_features(repo_path + dataset.directories["ques_val"], "val")
 
-c_d.combine_decompose(repo_path + dataset.HDF5_files["text_val"], repo_path + dataset.HDF5_files["img_val"], repo_path + dataset.HDF5_files["core_tensors"])
+c_d.combine_decompose(repo_path + dataset.HDF5_files["text_val"], repo_path + dataset.HDF5_files["img_val"], repo_path + dataset.HDF5_files["core_tensors_val"])
 
 core_hdf5 = repo_path + dataset.HDF5_files["core_tensors_val"]
 
