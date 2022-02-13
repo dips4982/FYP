@@ -14,12 +14,12 @@ from tqdm import tqdm
 
 def fit(num_of_epochs, model, loss_fn, opt, train_dl):
     train_accuracy = Accuracy()
-    for epoch in tqdm(range(num_of_epochs)):
+    for epoch in range(num_of_epochs):
 
         # for dropout
         model.train()
         losses = list()
-        
+
         for xb, yb in train_dl:
 
             # 1 forward
@@ -36,8 +36,6 @@ def fit(num_of_epochs, model, loss_fn, opt, train_dl):
 
             # 5 step in the opposite direction of the gradient
             opt.step()
-            
-            output = (torch.softmax(preds, dim=1)>0.5).int()
 
             # training step accuracy
             batch_acc = train_accuracy(output, yb.to(dtype=torch.int32))
@@ -46,6 +44,7 @@ def fit(num_of_epochs, model, loss_fn, opt, train_dl):
         
         total_train_accuracy = train_accuracy.compute()
         print(f'Epoch: {epoch+1} \t Training Loss: {torch.tensor(losses).mean(): .2f} \t Accuracy: {total_train_accuracy.absolute()}')
+        train_accuracy.reset()
 
 
 def train_fc_layer(core_hdf5, embeddings_file, annotations_file):
