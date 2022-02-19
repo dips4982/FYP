@@ -7,19 +7,34 @@ import torch.nn as nn
 from torch.utils.data import TensorDataset
 from torch.utils.data import DataLoader
 from torchmetrics import Accuracy
+from torchmetrics import F1
 
+import matplotlib.pyplot as plt
 from tqdm import tqdm
 
 
 def train_model(num_of_epochs, model, loss_fn, opt, train_dl):
+    train_graph = {
+        "accuracy": [],
+        "loss": [],
+        "F1": []
+    }
+
+    f1 = F1(num_classes = 3000, threshold = 0.5, top_k = 5)
+
     train_accuracy = Accuracy()
+
     for epoch in range(num_of_epochs):
 
         # for dropout
         model.train()
+
         losses = list()
         actual = list()
         predictions = list()
+
+        actual_index = list()
+        predictions_index = list()
         
         for xb, yb in train_dl:
 
@@ -37,46 +52,58 @@ def train_model(num_of_epochs, model, loss_fn, opt, train_dl):
 
             # 5 step in the opposite direction of the gradient
             opt.step()
-            
-            # output = (torch.softmax(preds, dim=1)>0.5).int()
 
-            # training step accuracy
-            # batch_acc = train_accuracy(preds, yb.to(dtype=torch.int32))
-            # print(preds, yb)
-            actual.append(torch.squeeze(yb))
-            predictions.append(torch.squeeze(preds))
+            for i in range(len(preds)):
+                predictions.append(np.array(preds[i][0].detach(), dtype = np.float64))
+                actual.append(np.array(yb[i][0], dtype = np.int32))
+
+                predictions_index.append(torch.argmax(preds[i][0]))
+                actual_index.append(torch.argmax(yb[i][0]))
+
+             # training step accuracy
+            batch_acc = train_accuracy(torch.tensor(predictions_index), torch.tensor(actual_index))
 
             losses.append(loss.item())
+
+        f1_score = f1(torch.tensor(predictions), torch.tensor(actual))
         
-        # total_validation_accuracy = train_accuracy.compute()
+        total_train_accuracy = train_accuracy.compute()
 
-        total = 0
-        correct = 0
-        for i in range(len(train_dl)):
-          a = actual[i].detach().numpy()
-          p = predictions[i].detach().numpy()
-          for j in range(len(a)):
-            # print(a[j], p[j])
-            act_label = np.argmax(a[j]) # act_label = 1 (index)
-            pred_label = np.argmax(p[j]) # pred_label = 1 (index)
-            if(act_label == pred_label):
-                correct += 1
-            total += 1
-        accuracy = (correct/total)
+        mean_loss = torch.tensor(losses).mean()
+        train_graph["loss"].append(mean_loss)
 
-        print(f'Epoch: {epoch+1} \t Training Loss: {torch.tensor(losses).mean(): .2f} \t Accuracy: {accuracy}')
+        train_graph["accuracy"].append(total_train_accuracy.absolute())
+
+        train_graph["F1"].append(f1_score)
+
+        print(f'Epoch: {epoch+1} \t Training Loss: {mean_loss: .2f} \t Accuracy: {total_train_accuracy.absolute()} \t F1 Score: {f1_score}')
         train_accuracy.reset()
+
+    return train_graph
 
 
 def validate_model(num_of_epochs, model, loss_fn, opt, validation_dl):
+    validation_graph = {
+        "accuracy": [],
+        "loss": [],
+        "F1": []
+    }
+
+    f1 = F1(num_classes = 3000, threshold = 0.5, top_k = 5)
+
     validation_accuracy = Accuracy()
+
     for epoch in range(num_of_epochs):
 
         # to turn off dropout
         model.eval()
+
         losses = list()
         actual = list()
         predictions = list()
+
+        actual_index = list()
+        predictions_index = list()
         
         for xb, yb in validation_dl:
 
@@ -88,40 +115,46 @@ def validate_model(num_of_epochs, model, loss_fn, opt, validation_dl):
             # 2 compute the objective function
             loss = loss_fn(torch.squeeze(preds), torch.squeeze(yb))
 
-            # output = (torch.softmax(preds, dim=1)>0.5).int()
+            for i in range(len(preds)):
+                predictions.append(np.array(preds[i][0].detach(), dtype = np.float64))
+                actual.append(np.array(yb[i][0], dtype = np.int32))
+
+                predictions_index.append(torch.argmax(preds[i][0]))
+                actual_index.append(torch.argmax(yb[i][0]))
 
             # validationing step accuracy
-            # batch_acc = validation_accuracy(preds, yb.to(dtype=torch.int32))
-            actual.append(torch.squeeze(yb))
-            predictions.append(torch.squeeze(preds))
+            batch_acc = validation_accuracy(torch.tensor(predictions_index), torch.tensor(actual_index))
 
             # add loss to loss_list
             losses.append(loss.item())
+
+        f1_score = f1(torch.tensor(predictions), torch.tensor(actual))
         
-        total = 0
-        correct = 0
-        for i in range(len(validation_dl)):
-          a = actual[i].detach().numpy()
-          p = predictions[i].detach().numpy()
-          for j in range(len(a)):
-            # print(a[j], p[j])
-            act_label = np.argmax(a[j]) # act_label = 1 (index)
-            pred_label = np.argmax(p[j]) # pred_label = 1 (index)
-            if(act_label == pred_label):
-                correct += 1
-            total += 1
-        accuracy = (correct/total)
-        # total_validation_accuracy = validation_accuracy.compute()
-        print(f'Epoch: {epoch+1} \t Validation Loss: {torch.tensor(losses).mean(): .2f} \t Accuracy: {accuracy}')
+        total_validation_accuracy = validation_accuracy.compute()
+
+        mean_loss = torch.tensor(losses).mean()
+        validation_graph["loss"].append(mean_loss)
+
+        validation_graph["accuracy"].append(total_train_accuracy.absolute())
+
+        validation_graph["F1"].append(f1_score)
+
+        print(f'Epoch: {epoch+1} \t Validation Loss: {mean_loss: .2f} \t Accuracy: {total_validation_accuracy.absolute()} \t F1 Score: {f1_score}')
         validation_accuracy.reset()
+
+    return validation_graph
 
 
 def train_and_validate_fc_layer(train_core_hdf5, validation_core_hdf5, embeddings_file, train_annotations_file, validation_annotations_file):
+    
     # instantiate the model
-    model = nn.Linear(384, 3000)
+    model = nn.Sequential(
+        nn.Linear(384, 3000),
+        nn.Softmax(dim=2)
+    )
 
     # print model architecture
-    print(model.parameters())
+    print(model.parameters)
 
     freq_ans_file = open(embeddings_file)
     freq_ans_data = json.load(freq_ans_file)
@@ -155,7 +188,7 @@ def train_and_validate_fc_layer(train_core_hdf5, validation_core_hdf5, embedding
 
     # Training Dataset
     train_ds = TensorDataset(train_inputs, train_outputs)
-    batch_size = 5
+    batch_size = 512
     train_dl = DataLoader(train_ds, batch_size, shuffle = True)
 
 
@@ -187,14 +220,40 @@ def train_and_validate_fc_layer(train_core_hdf5, validation_core_hdf5, embedding
 
     # Validation Dataset
     validation_ds = TensorDataset(validation_inputs, validation_outputs)
-    batch_size = 5
+    batch_size = 512
     validation_dl = DataLoader(validation_ds, batch_size, shuffle = True)
 
     loss_fn = nn.CrossEntropyLoss()
-    opt = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
+    opt = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
 
-    train_model(50, model, loss_fn, opt, train_dl)
-    validate_model(50, model, loss_fn, opt, validation_dl)
+    train_graph = train_model(100, model, loss_fn, opt, train_dl)
+    validation_graph = validate_model(100, model, loss_fn, opt, validation_dl)
 
+    plt.figure(figsize=(10,5))
+    plt.title("Loss")
+    plt.plot(train_graph["loss"],label="train loss")
+    plt.plot(validation_graph["loss"],label="validation loss")
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss")
+    plt.legend()
+    plt.show()
+
+    plt.figure(figsize=(10,5))
+    plt.title("Accuracy")
+    plt.plot(train_graph["accuracy"],label="train Accuracy")
+    plt.plot(validation_graph["accuracy"],label="validation Accuracy")
+    plt.xlabel("Epoch")
+    plt.ylabel("Accuracy")
+    plt.legend()
+    plt.show()
+
+    plt.figure(figsize=(10,5))
+    plt.title("F1 score")
+    plt.plot(train_graph["F1"],label="train F1")
+    plt.plot(validation_graph["F1"],label="validation F1")
+    plt.xlabel("Epoch")
+    plt.ylabel("F1")
+    plt.legend()
+    plt.show()
 
     torch.save(model, "model.pt")
