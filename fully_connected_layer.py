@@ -135,7 +135,7 @@ def validate_model(num_of_epochs, model, loss_fn, opt, validation_dl):
         mean_loss = torch.tensor(losses).mean()
         validation_graph["loss"].append(mean_loss)
 
-        validation_graph["accuracy"].append(total_train_accuracy.absolute())
+        validation_graph["accuracy"].append(total_validation_accuracy.absolute())
 
         validation_graph["F1"].append(f1_score)
 
