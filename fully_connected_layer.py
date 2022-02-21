@@ -37,6 +37,9 @@ def train_model(num_of_epochs, model, loss_fn, opt, train_dl):
         predictions_index = list()
         
         for xb, yb in train_dl:
+            
+            xb = xb.cuda()
+            yb = yb.cuda()
 
             # 1 forward
             preds = model(xb)
@@ -54,8 +57,8 @@ def train_model(num_of_epochs, model, loss_fn, opt, train_dl):
             opt.step()
 
             for i in range(len(preds)):
-                predictions.append(np.array(preds[i][0].detach(), dtype = np.float64))
-                actual.append(np.array(yb[i][0], dtype = np.int32))
+                predictions.append(np.array(preds[i][0].detach().cpu(), dtype = np.float64))
+                actual.append(np.array(yb[i][0].cpu(), dtype = np.int32))
 
                 predictions_index.append(torch.argmax(preds[i][0]))
                 actual_index.append(torch.argmax(yb[i][0]))
@@ -107,6 +110,9 @@ def validate_model(num_of_epochs, model, loss_fn, opt, validation_dl):
         
         for xb, yb in validation_dl:
 
+            xb = xb.cuda()
+            yb = yb.cuda()
+
             # 1 forward
             preds = None
             with torch.no_grad():
@@ -116,8 +122,8 @@ def validate_model(num_of_epochs, model, loss_fn, opt, validation_dl):
             loss = loss_fn(torch.squeeze(preds), torch.squeeze(yb))
 
             for i in range(len(preds)):
-                predictions.append(np.array(preds[i][0].detach(), dtype = np.float64))
-                actual.append(np.array(yb[i][0], dtype = np.int32))
+                predictions.append(np.array(preds[i][0].detach().cpu(), dtype = np.float64))
+                actual.append(np.array(yb[i][0].cpu(), dtype = np.int32))
 
                 predictions_index.append(torch.argmax(preds[i][0]))
                 actual_index.append(torch.argmax(yb[i][0]))
@@ -151,7 +157,7 @@ def train_and_validate_fc_layer(train_core_hdf5, validation_core_hdf5, embedding
     model = nn.Sequential(
         nn.Linear(384, 3000),
         nn.Softmax(dim=2)
-    )
+    ).cuda()
 
     # print model architecture
     print(model.parameters)

@@ -13,7 +13,7 @@ class ImgExtractor():
 
     def __init__(self):
         # Load the pretrained model
-        self.model = models.resnet152(pretrained=True)
+        self.model = models.resnet152(pretrained=True).cuda()
         # Use the model object to select the desired layer
         self.layer = self.model._modules.get('avgpool')
 
@@ -31,7 +31,7 @@ class ImgExtractor():
         if len(img.size) == 2:
             img = Image.new("RGB", img.size)
         # 2. Create a PyTorch Variable with the transformed image
-        t_img = Variable(self.normalize(self.to_tensor(self.scaler(img))).unsqueeze(0))
+        t_img = Variable(self.normalize(self.to_tensor(self.scaler(img))).unsqueeze(0)).cuda()
         # 3. Create a vector of zeros that will hold our feature vector
         #    The 'avgpool' layer has an output size of 512
         my_embedding = torch.zeros(2048)
