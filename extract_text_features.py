@@ -13,7 +13,7 @@ class TextFeatureExtractor():
     def extract_features(self, direc, dataset_part = "train"):
         classifier = self.classifier
         with open('questions.json') as data_file:    
-            h5file = h5py.File('text_features_' + dataset_part + '.hdf5', 'w')
+            h5file = h5py.File('./data/text_features_' + dataset_part + '.hdf5', 'w')
 
             data = json.load(data_file)
             for questions in data['questions']:
