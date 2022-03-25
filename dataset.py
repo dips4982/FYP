@@ -4,8 +4,8 @@ import os
 directories = {
     "img_train" : "/data/train2014",
     "img_val" : "/data/val2014",
-    "ques_train" : "/data/v2_Questions_Train_mscoco.json",
-    "ques_val" : "/data/v2_Questions_Val_mscoco.json",
+    "ques_train" : "/data/v2_OpenEnded_mscoco_train2014_questions.json",
+    "ques_val" : "/data/v2_OpenEnded_mscoco_val2014_questions.json",
     "ans_train" : "/data/v2_mscoco_train2014_annotations.json",
     "ans_val" : "/data/v2_mscoco_val2014_annotations.json"
 }
