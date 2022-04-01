@@ -11,6 +11,9 @@ repo_path = os.getcwd()
 dataset.download_dataset(repo_path, "images", "train")
 dataset.download_dataset(repo_path, "questions", "train")
 
+dataset.download_dataset(repo_path, "images", "val")
+dataset.download_dataset(repo_path, "questions", "val")
+
 ex_img.ImgExtractor().extract(repo_path + dataset.directories["img_train"], "train")
 ex_text.TextFeatureExtractor().extract_features(repo_path + dataset.directories["ques_train"], "train")
 
