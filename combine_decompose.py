@@ -6,6 +6,8 @@ from tqdm import tqdm
 
 
 def combine_decompose(text_hdf5, img_hdf5, core_hdf5):
+    print("\t-----Combining and Decomposing Feature Tensors-----")
+    
     tensor_to_decompose = []
     ques_ids = []
 
