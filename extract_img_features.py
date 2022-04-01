@@ -48,6 +48,8 @@ class ImgExtractor():
         return my_embedding
 
     def extract(self, direc, dataset_part = "train"):
+        print("\t-----Extracting Image Features-----")
+        
         img_files = list(os.listdir(direc))
 
         hdf5_file = h5py.File("./data/image_features_" + dataset_part + ".hdf5", 'w')
