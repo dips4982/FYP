@@ -11,6 +11,8 @@ class TextFeatureExtractor():
         self.classifier = SentenceTransformer('sentence-transformers/distilbert-base-nli-max-tokens')
 
     def extract_features(self, direc, dataset_part = "train"):
+        print("\t-----Extracting Text Features-----")
+        
         classifier = self.classifier
         with open('questions.json') as data_file:    
             h5file = h5py.File('./data/text_features_' + dataset_part + '.hdf5', 'w')
