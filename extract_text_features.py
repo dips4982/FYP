@@ -4,6 +4,7 @@ from transformers import pipeline
 import h5py
 import numpy
 from sentence_transformers import SentenceTransformer
+from tqdm import tqdm
 
 class TextFeatureExtractor():
 
@@ -18,7 +19,8 @@ class TextFeatureExtractor():
             h5file = h5py.File('./data/text_features_' + dataset_part + '.hdf5', 'w')
 
             data = json.load(data_file)
-            for questions in data['questions']:
+            for i in tqdm(range(len(data['questions']))):
+                questions = data['questions'][i]
                 h5file[str(questions['question_id'])] = classifier.encode(questions['question'])
 
             h5file.close()
