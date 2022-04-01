@@ -14,6 +14,8 @@ from tqdm import tqdm
 
 
 def train_model(num_of_epochs, model, loss_fn, opt, train_dl):
+    print("/t-----Training Phase Started-----")
+    
     train_graph = {
         "accuracy": [],
         "loss": [],
@@ -86,6 +88,8 @@ def train_model(num_of_epochs, model, loss_fn, opt, train_dl):
 
 
 def validate_model(num_of_epochs, model, loss_fn, opt, validation_dl):
+    print("/t-----Validation Phase Started-----")
+    
     validation_graph = {
         "accuracy": [],
         "loss": [],
@@ -172,6 +176,8 @@ def train_and_validate_fc_layer(train_core_hdf5, validation_core_hdf5, embedding
 
     train_inputs = []
     train_outputs = []
+    
+    print("/t-----Constructing Training Input Output Datasets-----")
 
     with h5py.File(train_core_hdf5, 'r') as core_file:
         ques_ids = list(core_file.keys())
@@ -197,7 +203,8 @@ def train_and_validate_fc_layer(train_core_hdf5, validation_core_hdf5, embedding
     batch_size = 512
     train_dl = DataLoader(train_ds, batch_size, shuffle = True)
 
-
+    print("/t-----Constructing Validation Input Output Datasets-----")
+    
     ## Validation
     validation_ans_file = open(validation_annotations_file)
     validation_ans_data = json.load(validation_ans_file)
@@ -234,6 +241,8 @@ def train_and_validate_fc_layer(train_core_hdf5, validation_core_hdf5, embedding
 
     train_graph = train_model(100, model, loss_fn, opt, train_dl)
     validation_graph = validate_model(100, model, loss_fn, opt, validation_dl)
+    
+    print("/t-----Plotting Loss and Accuracy Graphs of Training and Validation-----")
 
     plt.figure(figsize=(10,5))
     plt.title("Loss")
@@ -263,3 +272,5 @@ def train_and_validate_fc_layer(train_core_hdf5, validation_core_hdf5, embedding
     plt.show()
 
     torch.save(model, "model.pt")
+    
+    print("/t-----Model Saved Successfully-----")
