@@ -53,8 +53,13 @@ class ImgExtractor():
         img_files = list(os.listdir(direc))
 
         hdf5_file = h5py.File("./data/image_features_" + dataset_part + ".hdf5", 'w')
-
-        for i in tqdm(range(len(img_files))):
-            hdf5_file[str(int(img_files[i][15:27]))] = self.get_vector(direc + "/" + img_files[i]).detach().cpu().numpy()
+        
+        if dataset_part == "train":
+            for i in tqdm(range(len(img_files))):
+                hdf5_file[str(int(img_files[i][15:27]))] = self.get_vector(direc + "/" + img_files[i]).detach().cpu().numpy()
+                
+        else:
+            for i in tqdm(range(len(img_files))):
+                hdf5_file[str(int(img_files[i][13:25]))] = self.get_vector(direc + "/" + img_files[i]).detach().cpu().numpy()
 
         hdf5_file.close()
