@@ -18,6 +18,12 @@ ex_img.ImgExtractor().extract(repo_path + dataset.directories["img_train"], "tra
 ex_text.TextFeatureExtractor().extract_features(repo_path + dataset.directories["ques_train"], "train")
 
 c_d.combine_decompose(repo_path + dataset.HDF5_files["text_train"], repo_path + dataset.HDF5_files["img_train"], repo_path + dataset.HDF5_files["core_tensors_train"])
+
+ex_img.ImgExtractor().extract(repo_path + dataset.directories["img_val"], "val")
+ex_text.TextFeatureExtractor().extract_features(repo_path + dataset.directories["ques_val"], "val")
+
+c_d.combine_decompose(repo_path + dataset.HDF5_files["text_val"], repo_path + dataset.HDF5_files["img_val"], repo_path + dataset.HDF5_files["core_tensors_val"])
+
 fcl.train_and_validate_fc_layer(
     repo_path + dataset.HDF5_files["core_tensors_train"], 
     repo_path + dataset.HDF5_files["core_tensors_val"], 
