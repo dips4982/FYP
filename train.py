@@ -1,15 +1,13 @@
 import json
 import numpy as np 
 import h5py
-
+import json
 import torch
 import torch.nn as nn
 from torch.utils.data import TensorDataset
 from torch.utils.data import DataLoader
 from torchmetrics import Accuracy
 from torchmetrics import F1
-
-import matplotlib.pyplot as plt
 from tqdm import tqdm
 
 
@@ -141,33 +139,12 @@ def train_fc_layer(train_core_hdf5, embeddings_file, train_annotations_file):
     opt = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
 
     train_graph = train_model(100, model, loss_fn, opt, train_dl)
+
+    # save training graph in json file
+    with open('train_graph.json', 'w') as f:
+        json.dump(train_graph, f)
     
-    print("/t-----Plotting Loss and Accuracy Graphs of Training-----")
-
-    plt.figure(figsize=(10,5))
-    plt.title("Loss")
-    plt.plot(train_graph["loss"],label="train loss")
-    plt.xlabel("Epoch")
-    plt.ylabel("Loss")
-    plt.legend()
-    plt.show()
-
-    plt.figure(figsize=(10,5))
-    plt.title("Accuracy")
-    plt.plot(train_graph["accuracy"],label="train Accuracy")
-    plt.xlabel("Epoch")
-    plt.ylabel("Accuracy")
-    plt.legend()
-    plt.show()
-
-    plt.figure(figsize=(10,5))
-    plt.title("F1 score")
-    plt.plot(train_graph["F1"],label="train F1")
-    plt.xlabel("Epoch")
-    plt.ylabel("F1")
-    plt.legend()
-    plt.show()
-
     torch.save(model, "model.pt")
-    
     print("/t-----Model Saved Successfully-----")
+    
+

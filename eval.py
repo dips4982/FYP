@@ -1,15 +1,13 @@
 import json
 import numpy as np 
 import h5py
-
+import json
 import torch
 import torch.nn as nn
 from torch.utils.data import TensorDataset
 from torch.utils.data import DataLoader
 from torchmetrics import Accuracy
 from torchmetrics import F1
-
-import matplotlib.pyplot as plt
 from tqdm import tqdm
 
 
@@ -131,29 +129,9 @@ def validate_fc_layer( validation_core_hdf5, embeddings_file, validation_annotat
     opt = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
 
     validation_graph = validate_model(100, model, loss_fn, opt, validation_dl)
-    
-    print("/t-----Plotting Loss and Accuracy Graphs of Training and Validation-----")
 
-    plt.figure(figsize=(10,5))
-    plt.title("Loss")
-    plt.plot(validation_graph["loss"],label="validation loss")
-    plt.xlabel("Epoch")
-    plt.ylabel("Loss")
-    plt.legend()
-    plt.show()
+    # save validation graph in json file
+    with open('validation_graph.json', 'w') as fp:
+        json.dump(validation_graph, fp)
 
-    plt.figure(figsize=(10,5))
-    plt.title("Accuracy")
-    plt.plot(validation_graph["accuracy"],label="validation Accuracy")
-    plt.xlabel("Epoch")
-    plt.ylabel("Accuracy")
-    plt.legend()
-    plt.show()
-
-    plt.figure(figsize=(10,5))
-    plt.title("F1 score")
-    plt.plot(validation_graph["F1"],label="validation F1")
-    plt.xlabel("Epoch")
-    plt.ylabel("F1")
-    plt.legend()
-    plt.show()
+    print("/t-----Validation Phase Ended-----")
