@@ -1,7 +1,6 @@
 import json
 import numpy as np 
 import h5py
-import json
 import torch
 import torch.nn as nn
 from torch.utils.data import TensorDataset
@@ -9,6 +8,7 @@ from torch.utils.data import DataLoader
 from torchmetrics import Accuracy
 from torchmetrics import F1
 from tqdm import tqdm
+import pickle
 
 
 def train_model(num_of_epochs, model, loss_fn, opt, train_dl):
@@ -100,6 +100,9 @@ def train_fc_layer(train_core_hdf5, embeddings_file, train_annotations_file):
     freq_ans_data = json.load(freq_ans_file)
     freq_ans_file.close()
 
+    mapping_file = open('non_frequent_mapping_qid', 'rb')
+    mapping_data = pickle.load(mapping_file)
+
     ## Training
     train_ans_file = open(train_annotations_file)
     train_ans_data = json.load(train_ans_file)
@@ -116,7 +119,7 @@ def train_fc_layer(train_core_hdf5, embeddings_file, train_annotations_file):
             i = ques_ids[r]
             train_inputs.append(np.array(core_file[i], dtype = np.float32))
 
-            ans_arr = [[int(x) for x in freq_ans_data[data[int(i)]]]]
+            ans_arr = [[int(x) for x in freq_ans_data[mapping_data[int(i)]]]]
             train_outputs.append(np.array(ans_arr, dtype = np.float32))
 
     # Convert to tensors
