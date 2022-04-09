@@ -115,15 +115,9 @@ def train_fc_layer(train_core_hdf5, embeddings_file, train_annotations_file):
         for r in tqdm(range(len(ques_ids))):
             i = ques_ids[r]
             train_inputs.append(np.array(core_file[i], dtype = np.float32))
-            
-            for element in train_ans_data['annotations']:
-                if element['question_id'] == int(i):
-                    if element['multiple_choice_answer'] in freq_ans_data:
-                        ans_arr = [[int(x) for x in freq_ans_data[element['multiple_choice_answer']]]]
-                        train_outputs.append(np.array(ans_arr, dtype = np.float32))
-                    else:
-                        ans_arr = [[int(x) for x in freq_ans_data["yes"]]]
-                        train_outputs.append(np.array(ans_arr, dtype = np.float32))
+
+            ans_arr = [[int(x) for x in freq_ans_data[data[int(i)]]]]
+            train_outputs.append(np.array(ans_arr, dtype = np.float32))
 
     # Convert to tensors
     train_inputs = torch.from_numpy(np.array(train_inputs))
@@ -131,14 +125,14 @@ def train_fc_layer(train_core_hdf5, embeddings_file, train_annotations_file):
 
     # Training Dataset
     train_ds = TensorDataset(train_inputs, train_outputs)
-    batch_size = 64
+    batch_size = 256
     train_dl = DataLoader(train_ds, batch_size, shuffle = True)
 
 
     loss_fn = nn.CrossEntropyLoss()
     opt = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
 
-    train_graph = train_model(100, model, loss_fn, opt, train_dl)
+    train_graph = train_model(10, model, loss_fn, opt, train_dl)
 
     # save training graph in json file
     with open('train_graph.json', 'w') as f:

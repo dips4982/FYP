@@ -122,13 +122,13 @@ def validate_fc_layer( validation_core_hdf5, embeddings_file, validation_annotat
 
     # Validation Dataset
     validation_ds = TensorDataset(validation_inputs, validation_outputs)
-    batch_size = 64
+    batch_size = 256
     validation_dl = DataLoader(validation_ds, batch_size, shuffle = True)
 
     loss_fn = nn.CrossEntropyLoss()
     opt = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
 
-    validation_graph = validate_model(100, model, loss_fn, opt, validation_dl)
+    validation_graph = validate_model(10, model, loss_fn, opt, validation_dl)
 
     # save validation graph in json file
     with open('validation_graph.json', 'w') as fp:
