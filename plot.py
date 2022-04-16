@@ -1,16 +1,16 @@
 import matplotlib.pyplot as plt
-import json
+import pickle
 
 train_graph = None
 validation_graph = None
 
 # load train_graph json file
-with open('train_graph.json') as f: 
-    train_graph = json.load(f)
+train_file = open('train_graph', 'rb') 
+train_graph = pickle.load(train_file)
 
 # load validation_graph json file
-with open('validation_graph.json') as f:
-    validation_graph = json.load(f)
+val_file = open('validation_graph', 'rb')
+validation_graph = pickle.load(val_file)
 
 print("/t-----Plotting Loss and Accuracy Graphs of Training and Validation-----")
 
