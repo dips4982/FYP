@@ -128,7 +128,7 @@ def train_fc_layer(train_core_hdf5, embeddings_file, train_annotations_file):
 
     # Training Dataset
     train_ds = TensorDataset(train_inputs, train_outputs)
-    batch_size = 256
+    batch_size = 512
     train_dl = DataLoader(train_ds, batch_size, shuffle = True)
 
 
@@ -136,12 +136,15 @@ def train_fc_layer(train_core_hdf5, embeddings_file, train_annotations_file):
     opt = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
 
     train_graph = train_model(10, model, loss_fn, opt, train_dl)
-
-    # save training graph in json file
-    with open('train_graph.json', 'w') as f:
-        json.dump(train_graph, f)
     
     torch.save(model, "model.pt")
     print("/t-----Model Saved Successfully-----")
-    
 
+    # save training graph in json file
+    try:
+        train_file = open('train_graph', 'wb')
+        pickle.dump(train_graph, train_file)
+        train_file.close()
+
+    except:
+        print("Unable to write training stats to file !!")
