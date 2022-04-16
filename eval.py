@@ -4,6 +4,7 @@ import h5py
 import json
 import torch
 import torch.nn as nn
+import pickle
 from torch.utils.data import TensorDataset
 from torch.utils.data import DataLoader
 from torchmetrics import Accuracy
@@ -122,7 +123,7 @@ def validate_fc_layer( validation_core_hdf5, embeddings_file, validation_annotat
 
     # Validation Dataset
     validation_ds = TensorDataset(validation_inputs, validation_outputs)
-    batch_size = 256
+    batch_size = 512
     validation_dl = DataLoader(validation_ds, batch_size, shuffle = True)
 
     loss_fn = nn.CrossEntropyLoss()
@@ -131,7 +132,12 @@ def validate_fc_layer( validation_core_hdf5, embeddings_file, validation_annotat
     validation_graph = validate_model(10, model, loss_fn, opt, validation_dl)
 
     # save validation graph in json file
-    with open('validation_graph.json', 'w') as fp:
-        json.dump(validation_graph, fp)
+    try:
+        val_file = open('validation_graph', 'wb')
+        pickle.dump(validation_graph, val_file)
+        val_file.close()
+
+    except:
+        print("Unable to write Validation stats to file !!")
 
     print("/t-----Validation Phase Ended-----")
