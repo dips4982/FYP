@@ -12,7 +12,7 @@ import pickle
 
 
 def train_model(num_of_epochs, model, loss_fn, opt, train_dl):
-    print("/t-----Training Phase Started-----")
+    print("\t-----Training Phase Started-----")
     
     train_graph = {
         "accuracy": [],
@@ -120,7 +120,7 @@ def train_fc_layer(train_core_hdf5, embeddings_file, train_annotations_file):
             train_inputs.append(np.array(core_file[i], dtype = np.float32))
 
             ans_arr = [[int(x) for x in freq_ans_data[mapping_data[int(i)]]]]
-            train_outputs.append(np.array(ans_arr, dtype = np.int32))
+            train_outputs.append(np.array(ans_arr, dtype = np.float32))
 
     # Convert to tensors
     train_inputs = torch.from_numpy(np.array(train_inputs))
